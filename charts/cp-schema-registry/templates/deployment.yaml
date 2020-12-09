@@ -100,11 +100,22 @@ spec:
           - name: JMX_PORT
             value: "{{ .Values.jmx.port }}"
           {{- end }}
+          {{- if .Values.configSecrets }}
+          volumeMounts:
+          - name: config-secrets-volume
+            mountPath: /etc/cp-schema-registry-config-secrets
+            readOnly: true
+          {{- end }}
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
       {{- end }}
       volumes:
+      {{- if .Values.configSecrets }}
+      - name: config-secrets-volume
+        secret:
+          secretName: {{ .Values.configSecrets }}
+      {{- end }}
       {{- if .Values.prometheus.jmx.enabled }}
       - name: jmx-config
         configMap:
